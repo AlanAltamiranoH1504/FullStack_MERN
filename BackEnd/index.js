@@ -5,6 +5,8 @@ import conexionDB from "./config/db.js";
 
 //Instancia de express
 const app = express();
+//Habilitamos el request.body
+app.use(express.json());
 
 //Definimos puerto de express
 const port = process.env.PORT || 4000;
@@ -15,7 +17,8 @@ app.listen(port, () =>{
 dotenv.config();
 conexionDB();
 
-//Definimos la primera ruta
-app.use("/", (req, res) =>{
-   res.send("Esta funcionando de manera correcta el servidor 4000. Alan Altamirano");
-});
+//Importaciones de routers
+import veterinarioRoutes from "./routes/VeterinarioRoutes.js";
+
+//Definimos la ruta base de RouterVeterinarios
+app.use("/api/veterinarios", veterinarioRoutes);
