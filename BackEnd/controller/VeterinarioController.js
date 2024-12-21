@@ -40,6 +40,28 @@ const confirmar = async (req, res) =>{
     }
 };
 
+const autenticar = async (req, res) =>{
+    /*1. usuario exista, 2. cuenta confirmada, 3.password correcta 4. lo autentico*/
+    const {email, password} = req.body;
+    // Comprobamos que el usuario existe con ese email
+    const usuarioExiste = await Veterinario.findOne({email: email});
+    if (!usuarioExiste){
+        res.json({msg: "Usuario no registrado"});
+        return;
+    }else{
+        const {confirmado} = usuarioExiste;
+        if (confirmado){
+            if (await usuarioExiste.comprobarPassword(password)){
+                res.json({msg:"Usuario registrado, confirmado y con password correcta"});
+            }else{
+                res.json({msg:"Contraseña incorrecta"});
+            }
+        }else{
+            res.json({msg:"No ha confirmado su cuenta"})
+        }
+    }
+}
+
 const perfil = async (req, res) =>{
     res.json({
         msg: "Mostrando perfil"
@@ -49,5 +71,6 @@ const perfil = async (req, res) =>{
 export {
     registrar,
     perfil,
-    confirmar
+    confirmar,
+    autenticar
 }
