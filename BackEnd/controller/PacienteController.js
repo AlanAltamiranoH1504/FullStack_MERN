@@ -51,15 +51,50 @@ const actualizarPaciente = async (req, res) => {
     //Buscamos el paciente
     const paciente = await Paciente.findOne({_id: idPaciente, veterinario: veterinarioSesion});
     if (paciente !== null){
-        res.json({paciente: paciente});
+        //Seteamos al paciente encontrado los nuevos valores
+        const {nombre, propietario, email, fecha, sintomas} = req.body;
+        paciente.nombre = nombre || paciente.nombre;
+        paciente.propietario = propietario || paciente.propietario;
+        paciente.email = email || paciente.email;
+        paciente.fecha = fecha || paciente.fecha;
+        paciente.sintomas = sintomas || paciente.sintomas;
+        try{
+            //Actualizamos el paciente
+            const pacienteActualizado = await paciente.save();
+            res.json({paciente});
+        }catch (e){
+            const error = new Error("Error en actualizacion de paciente");
+            res.json({msg: error});
+        }
     }else{
-        res.json({msg: "Paciente no encontrado"});
+        res.json({msg: "No existe ese paciente"});
     }
 }
 
+const eliminarPaciente = async (req, res) =>{
+    const idPaciente = req.params.id;
+    const veterinarioSesion = req.veterinario._id;
+    const paciente = await Paciente.findOne({_id: idPaciente, veterinario: veterinarioSesion});
+
+    if (paciente !== null){
+        try{
+            const pacienteEliminado = await Paciente.deleteOne({_id: idPaciente});
+            if (pacienteEliminado !== null){
+                res.json({msg: "Paciente eliminado"});
+            }
+        }catch (e){
+            const error = new Error("Error en eliminar el paciente");
+            res.json({msg: "Error al eliminar el paciente"});
+        }
+    }else{
+        const error = new Error("No existe ese paciente");
+        res.json({msg: "Paciente no existente"});
+    }
+}
 export {
     agregarPacientes,
     obtenerPacientes,
     obtenerPaciente,
-    actualizarPaciente
+    actualizarPaciente,
+    eliminarPaciente
 }
