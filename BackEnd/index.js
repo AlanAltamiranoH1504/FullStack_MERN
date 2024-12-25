@@ -17,11 +17,10 @@ app.listen(port, () =>{
 dotenv.config();
 conexionDB();
 
-//Importaciones de routers
+//Importaciones de routers de Veterinario y Paciente
 import veterinarioRoutes from "./routes/VeterinarioRoutes.js";
 import pacienteRoutes from "./routes/PacienteRoutes.js";
 
 //Definimos la ruta base de RouterVeterinarios
 app.use("/api/veterinarios", veterinarioRoutes);
-//Definimos la ruta vase de pacienteRoutes
 app.use("/api/pacientes", pacienteRoutes);

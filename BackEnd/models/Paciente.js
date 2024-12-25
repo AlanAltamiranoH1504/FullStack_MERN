@@ -1,40 +1,42 @@
 import mongoose from "mongoose";
 const {Schema} = mongoose;
 
-const pacienteSchema = new Schema({
-    nombre: {
+const pacietesSchema = new Schema({
+    nombre:{
         type: String,
         require: true,
         trim: true
     },
-    propietario: {
+    propietario:{
         type: String,
         require: true,
         trim: true
     },
     email:{
-        type:String,
-        require: true,
+        type: String,
         unique: true,
+        required: true,
         trim: true
     },
-    fecha_alta: {
+    fecha:{
         type: Date,
         require: true,
         default: Date.now()
     },
-    sintomas: {
-        type: String,
+    sintomas:{
+        type:String,
         require: true,
         trim: true
     },
+    //Almacenamos referencia del veterinario de este paciente. Es la FK en relacion con la tabla Veterinarios
     veterinario:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Veterinario'
     }
-},{
+}, {
     timestamps: true
 });
 
-const Paciente = mongoose.model("Paciente", pacienteSchema);
+//Vinculamos schema con modelo
+const Paciente = mongoose.model("Paciente", pacietesSchema);
 export default Paciente;

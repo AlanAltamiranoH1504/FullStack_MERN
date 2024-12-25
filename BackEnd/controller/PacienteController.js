@@ -1,71 +1,65 @@
 import Paciente from "../models/Paciente.js";
-import express, {json, raw} from "express";
 import paciente from "../models/Paciente.js";
 
-const agregarPaciente = async (req, res) =>{
+const agregarPacientes = async (req, res) => {
+    //Creamos paciente con los req.body
+    const paciente = new Paciente(req.body);
+
+    //Guardamos el paciente en la db
     try {
-        const paciente = new Paciente(req.body);
-        paciente.veterinario = req.veterinario._id;
+        //Sacamos el id del veterinario en sesion y lo seteamos al paciente
+        const veterinarioSesion = req.veterinario._id;
+        paciente.veterinario = veterinarioSesion;
+        //Guardamos el paciente
         const pacienteGuardado = await paciente.save();
         res.json({msg: "Paciente guardado"});
-    }catch (e){
-        const error = new Error("Error en el registro de paciente");
-        res.status(500).json({msg: error.message});
+    } catch (e) {
+        const Error = new error("Error en el registro de nuevo paciente");
+        res.json({msg: error});
     }
-
 }
 
-const obtenerPacientes = async (req, res) =>{
+const obtenerPacientes = async (req, res) => {
+    //Sacamos el veterinario que se encuentra en sesion
     const veterinarioSesion = req.veterinario._id;
-    const pacientes = await paciente.find().where("veterinario").equals(veterinarioSesion);
-    res.json(pacientes);
+    //Sacamos los pacientes de ese veterinario
+    const pacientes = await Paciente.find({veterinario: veterinarioSesion});
+    res.json({msg: "Pacientes del veterinario", pacientes: pacientes});
 }
 
-const obtenerPaciente =  async (req, res) =>{
-    const id = req.params.id;
-    try{
-        const pacienteEncontrado = await paciente.findById(id);
-
-        if (pacienteEncontrado.veterinario._id.toString() !== req.veterinario._id.toString()){
-            return res.json({msg: "Accion NO Valida"});
-        }else{
-            return res.json({msg: "Paciente encontrado", paciente: pacienteEncontrado});
+const obtenerPaciente = async (req, res) => {
+    const idPaciente = req.params.id;
+    const veterinarioSesion = req.veterinario._id;
+    try {
+        const paciente = await Paciente.findOne({_id: idPaciente, veterinario: veterinarioSesion});
+        if (paciente !== null) {
+            res.json({paciente: paciente});
+        } else {
+            res.json({msg: "Paciente no encontrado"});
         }
-    }catch (e){
-        const error = new Error("Error en la consulta del paciente");
-        res.status(500).json({msg: error.message});
+    } catch (e) {
+        const error = new Error("Paciente no Encontrado");
+        res.json({msg: error});
     }
 }
 
-const actualizarPaciente = async (req, res) =>{
-    // const id = req.params.id;
-    // const paciente = await paciente.findById(id);
-    // if (!paciente) {
-    //     return res.status(404).json({msg: "Paciente no existe"});
-    // }
-    //
-    // if (paciente.veterinario._id.toString() !== req.veterinario._id.toString()){
-    //     return res.json({msg:"Accion no valida"});
-    // }
-    // //Actualizar paciente
-    // paciente.nombre = req.body.nombre;
-    // try {
-    //     const pacienteActualizado = await paciente.save();
-    //     res.json({msg: "Paciente actualizado"});
-    // }catch (e){
-    //     console.log("ERROR: " + e);
-    // }
-}
+const actualizarPaciente = async (req, res) => {
+    //Sacamos el id del paciente y el id del veterinario en sesion
+    const idPaciente = req.params.id;
+    const veterinarioSesion = req.veterinario._id;
 
-const eliminarPaciente = (req, res) =>{
-    const id = req.params;
-    console.log(id);
+    //Buscamos el paciente
+    const paciente = await Paciente.findOne({_id: idPaciente, veterinario: veterinarioSesion});
+    if (paciente !== null){
+        res.json({paciente: paciente});
+    }else{
+        res.json({msg: "Paciente no encontrado"});
+    }
 }
 
 export {
-    agregarPaciente,
+    agregarPacientes,
     obtenerPacientes,
     obtenerPaciente,
-    actualizarPaciente,
-    eliminarPaciente
+    actualizarPaciente
 }
