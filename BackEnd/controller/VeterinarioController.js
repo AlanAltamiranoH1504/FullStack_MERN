@@ -1,13 +1,14 @@
 import Veterinario from "../models/Veterinario.js";
 import generarJWT from "../helpers/generarJWT.js";
 import generarID from "../helpers/generarID.js";
+import emailRegistro from "../helpers/emailRegistro.js";
 import e from "express";
 import {Error} from "mongoose";
 
 //Rutas disponibles
 const registrar = async (req, res) => {
     //Prevenir usuarios registrados
-    const {email} = req.body;
+    const {email, nombre, } = req.body;
     const existeUsuario = await Veterinario.findOne({email: email});
     if (existeUsuario) {
         res.json({msg: "Usuario ya registrado"});
@@ -18,6 +19,9 @@ const registrar = async (req, res) => {
         //Guardamos un nuevo Veterinario
         const veterinario = new Veterinario(req.body);
         const veterinarioGuardado = await veterinario.save();
+        //Enviamos el email
+        emailRegistro({email, nombre, token: veterinarioGuardado.token});
+
         res.json({veterinarioGuardado});
     } catch (error) {
         console.log("ERROR: " + error.message);
