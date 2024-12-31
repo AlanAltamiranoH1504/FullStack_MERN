@@ -30,7 +30,8 @@ const Registrar = () => {
         setAlerta({});
         //Guardamos en la db
         try{
-            const url = "http://localhost:4000/api/veterinarios";
+            const rutaBase = import.meta.env.VITE_BACKEND_URL
+            const url = `${rutaBase}/veterinarios`;
             const respuesta = await axios.post(url, {nombre, email, password});
             setAlerta({mensaje: "Veterinario Registrado, revisa tu email", error: false});
         }catch (e){

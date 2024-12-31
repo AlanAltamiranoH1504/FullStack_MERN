@@ -4,6 +4,7 @@ import generarID from "../helpers/generarID.js";
 import emailRegistro from "../helpers/emailRegistro.js";
 import e from "express";
 import {Error} from "mongoose";
+import emailOlvidePassword from "../helpers/emailOlvidePassword.js";
 
 //Rutas disponibles
 const registrar = async (req, res) => {
@@ -81,7 +82,7 @@ const perfil = async (req, res) => {
 }
 
 const reestablecer = async (req, res) => {
-    const {email} = req.body;
+    const {email, nombre} = req.body;
     //Buscamos el email en la db
     const veterinario = await Veterinario.findOne({email: email});
     if (!veterinario) {
@@ -93,6 +94,9 @@ const reestablecer = async (req, res) => {
         //Generamos token para ese usuario econtrado
         veterinario.token = generarID();
         await veterinario.save();
+        //Enviamos email para reestablecer password
+        emailOlvidePassword({email, nombre: veterinario.nombre, token: veterinario.token});
+
         res.json({msg: "Hemos enviado un email con las instrucciones"});
         //Guardamos en la db
     } catch (error) {
@@ -124,7 +128,6 @@ const nuevoPassword = async (req, res) => {
     if (veterinario){
         try{
             veterinario.token = null;
-            console.log(veterinario);
             veterinario.password = password;
             await veterinario.save();
             res.json({msg: "Password actualizada"});
@@ -132,7 +135,6 @@ const nuevoPassword = async (req, res) => {
             const error = new Error("Error en actualizacion de password");
             res.status(400).json({msg: error.message});
         }
-        res.json({msg: "Hay veterinario con ese token"});
     }else{
         const error = new Error("Hubo un error");
         return res.status(400).json({msg: error.message});
