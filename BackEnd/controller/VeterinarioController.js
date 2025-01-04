@@ -60,9 +60,12 @@ const autenticar = async (req, res) => {
         const {confirmado} = usuarioExiste;
         if (confirmado) {
             if (await usuarioExiste.comprobarPassword(password)) {
+                usuarioExiste.token = generarJWT(usuarioExiste.id);
                 res.json({
-                    msg: "Usuario registrado, confirmado y con password correcta",
-                    token: generarJWT(usuarioExiste.id)
+                    _id: usuarioExiste._id,
+                    nombre: usuarioExiste.nombre,
+                    email: usuarioExiste.email,
+                    toke: usuarioExiste.token
                 });
             } else {
                 res.json({msg: "Contraseña incorrecta"});
@@ -76,7 +79,6 @@ const autenticar = async (req, res) => {
 const perfil = async (req, res) => {
     const veterinario = req.veterinario;
     res.json({
-        msg: "Mostrando perfil",
         veterinario
     });
 }

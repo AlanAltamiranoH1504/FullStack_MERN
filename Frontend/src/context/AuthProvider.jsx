@@ -4,12 +4,14 @@ import axios from "axios";
 
 const AuthContext = createContext();
 const AuthProvider = ({children}) => {
+    const [cargando, setCargando] = useState(true);
     const [auth, setAuth] = useState({});
 
     useEffect(() =>{
         const autenticarUsuario = async () =>{
             const token = localStorage.getItem('token');
             if (!token){
+                setCargando(false);
                 return;
             }
             const config = {
@@ -30,14 +32,22 @@ const AuthProvider = ({children}) => {
                 setAuth({});
                 console.log("ERROR: " + e.message);
             }
+            setCargando(false);
         }
         autenticarUsuario();
-    }, [])
+    }, []);
+
+    const cerrarSesion = () =>{
+        localStorage.removeItem("token");
+        setAuth({});
+    }
 
     return(
         <AuthContext.Provider value={{
             auth,
-            setAuth
+            setAuth,
+            cargando,
+            cerrarSesion
         }}>
             {children}
         </AuthContext.Provider>

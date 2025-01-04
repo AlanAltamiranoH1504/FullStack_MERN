@@ -6,7 +6,7 @@ import Alerta from "../components/Alerta.jsx";
 import axios from "axios";
 
 const Login = () => {
-    const {auth} = useAuth();
+    const {auth, setAuth} = useAuth();
     //States
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -28,6 +28,7 @@ const Login = () => {
             const respuesta = await axios.post(url, {email, password});
             const {data} = respuesta;
             const {msg} = data;
+            setAuth(data);
 
             if (msg === 'Contraseña incorrecta'){
                 setAlerta({mensaje: msg, error: true});
